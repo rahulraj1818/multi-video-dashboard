@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Multi Video Dashboard</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0a0a0a;
+color:white;
+padding:15px;
+}
+
+.app{
+max-width:1200px;
+margin:auto;
+}
+
+.title{
+font-size:30px;
+font-weight:bold;
+text-align:center;
+margin-bottom:20px;
+}
+
+.card{
+background:#171717;
+border-radius:28px;
+padding:20px;
+box-shadow:
+0 0 25px rgba(255,255,255,0.04);
+}
+
+label{
+display:block;
+margin-bottom:8px;
+font-size:14px;
+color:#aaa;
+}
+
+input{
+width:100%;
+padding:16px;
+border:none;
+outline:none;
+border-radius:18px;
+background:#262626;
+color:white;
+font-size:16px;
+margin-bottom:12px;
+}
+
+.row{
+display:flex;
+gap:10px;
+margin-bottom:12px;
+}
+
+.row input,
+.row button{
+flex:1;
+}
+
+button{
+border:none;
+padding:16px;
+border-radius:18px;
+font-size:15px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.create{
+background:#00c853;
+color:white;
+}
+
+.reload{
+background:#2979ff;
+color:white;
+}
+
+.auto{
+background:#ffb300;
+color:black;
+}
+
+.stop{
+background:#ff1744;
+color:white;
+}
+
+.stats{
+display:flex;
+justify-content:space-between;
+margin-top:15px;
+font-size:15px;
+color:#bbb;
+}
+
+.status-on{
+color:#00e676;
+font-weight:bold;
+}
+
+.status-off{
+color:#ff5252;
+font-weight:bold;
+}
+
+.example{
+margin-top:15px;
+font-size:13px;
+line-height:1.7;
+color:#888;
+text-align:center;
+}
+
+#container{
+margin-top:22px;
+display:grid;
+grid-template-columns:
+repeat(auto-fit,minmax(160px,1fr));
+gap:12px;
+}
+
+.videoCard{
+background:#171717;
+border-radius:22px;
+overflow:hidden;
+box-shadow:
+0 0 10px rgba(255,255,255,0.03);
+}
+
+.videoHeader{
+padding:10px;
+text-align:center;
+font-size:14px;
+font-weight:bold;
+background:#242424;
+}
+
+iframe{
+width:100%;
+height:180px;
+border:none;
+background:white;
+}
+
+@media(max-width:500px){
+
+.title{
+font-size:24px;
+}
+
+button{
+font-size:14px;
+padding:14px;
+}
+
+iframe{
+height:160px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="title">
+🎬 Multi Video Dashboard
+</div>
+
+<div class="card">
+
+<label>Paste Video Link</label>
+
+<input
+type="text"
+id="videoLink"
+placeholder="Paste video URL here">
+
+<label>Screens (Min 2 / Max 50)</label>
+
+<input
+type="number"
+id="screenCount"
+value="10"
+min="2"
+max="50">
+
+<label>Auto Reload Time</label>
+
+<div class="row">
+
+<input
+type="number"
+id="hours"
+value="0"
+placeholder="HH">
+
+<input
+type="number"
+id="minutes"
+value="0"
+placeholder="MM">
+
+<input
+type="number"
+id="seconds"
+value="10"
+placeholder="SS">
+
+</div>
+
+<div class="row">
+
+<button
+class="create"
+onclick="createScreens()">
+Create
+</button>
+
+<button
+class="reload"
+onclick="reloadAll()">
+Reload All
+</button>
+
+</div>
+
+<div class="row">
+
+<button
+class="auto"
+onclick="startAutoReload()">
+Auto Reload ON
+</button>
+
+<button
+class="stop"
+onclick="stopAutoReload()">
+Auto Reload OFF
+</button>
+
+</div>
+
+<div class="stats">
+
+<div>
+Screens:
+<span id="screenText">
+0
+</span>
+</div>
+
+<div>
+Status:
+<span
+id="status"
+class="status-off">
+OFF
+</span>
+</div>
+
+</div>
+
+<div class="example">
+
+Example Link:<br>
+https://example.com
+
+<br><br>
+
+YouTube Example:<br>
+https://youtube.com/watch?v=xxxx
+
+<br><br>
+
+Reload Example:<br>
+00 : 05 : 00 = 5 min
+
+</div>
+
+</div>
+
+<div id="container"></div>
+
+</div>
+
+<script>
+
+let reloadInterval;
+
+function createScreens(){
+
+let link =
+document.getElementById(
+"videoLink"
+).value.trim();
+
+let count =
+parseInt(
+document.getElementById(
+"screenCount"
+).value
+);
+
+if(!link){
+
+alert(
+"Please paste a video link"
+);
+
+return;
+}
+
+if(isNaN(count)
+|| count < 2
+|| count > 50){
+
+alert(
+"Only 2 to 50 screens allowed"
+);
+
+return;
+}
+
+let container =
+document.getElementById(
+"container"
+);
+
+container.innerHTML = "";
+
+for(let i=1;
+i<=count;
+i++){
+
+let card =
+document.createElement(
+"div"
+);
+
+card.className =
+"videoCard";
+
+card.innerHTML = `
+
+<div class="videoHeader">
+🔥 Screen ${i}
+</div>
+
+<iframe
+src="${link}">
+</iframe>
+
+`;
+
+container.appendChild(
+card
+);
+
+}
+
+document.getElementById(
+"screenText"
+).innerText =
+count;
+
+}
+
+function reloadAll(){
+
+let frames =
+document.querySelectorAll(
+"iframe"
+);
+
+frames.forEach(frame=>{
+
+frame.src =
+frame.src;
+
+});
+
+}
+
+function startAutoReload(){
+
+clearInterval(
+reloadInterval
+);
+
+let hh =
+parseInt(
+document.getElementById(
+"hours"
+).value
+) || 0;
+
+let mm =
+parseInt(
+document.getElementById(
+"minutes"
+).value
+) || 0;
+
+let ss =
+parseInt(
+document.getElementById(
+"seconds"
+).value
+) || 0;
+
+let totalSeconds =
+(hh * 3600)
++ (mm * 60)
++ ss;
+
+if(totalSeconds <= 0){
+
+alert(
+"Enter valid time"
+);
+
+return;
+}
+
+reloadInterval =
+setInterval(()=>{
+
+reloadAll();
+
+},totalSeconds
+*1000);
+
+document.getElementById(
+"status"
+).innerText =
+"ON";
+
+document.getElementById(
+"status"
+).className =
+"status-on";
+
+}
+
+function stopAutoReload(){
+
+clearInterval(
+reloadInterval
+);
+
+document.getElementById(
+"status"
+).innerText =
+"OFF";
+
+document.getElementById(
+"status"
+).className =
+"status-off";
+
+}
+
+</script>
+
+</body>
+</html>
